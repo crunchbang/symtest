@@ -75,7 +75,7 @@ public class SymTestUtil {
 	}
 
 	private static boolean isSAT(List<ICFEdge> path, ICFG cfg) throws Exception {
-//		System.out.println("@@@UTIL Bin candidate getSET");
+		System.out.println("@@@UTIL Bin candidate getSET");
 		SET set = getSET(path, cfg);
 		// Solve the predicate
 		SolverResult solution = solveSequence(set);

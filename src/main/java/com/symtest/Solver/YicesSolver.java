@@ -41,7 +41,6 @@ public class YicesSolver implements ISolver {
 		out.close();
 		String command = SymTestConfiguration.YICES_PATH + " resources/input.ys";
 		String output = YicesSolver.cmdExec(command);
-		// System.out.println("yices output :\n" + output);
 
 		System.out.println("Yices output = " + output);
 		SolverResult result = this.parseYicesOutput(output);

@@ -49,8 +49,9 @@ public class SEE {
 	 * @throws Exception
 	 */
 	public void expandSET(List<ICFEdge> cfgEdges) throws Exception {
+		System.out.println("CURRENT MSET: " + this.mSET);
 		for (ICFEdge edge : cfgEdges) {
-			logger.finest("SEE singlestep edge: " + edge.getId());
+			System.out.println("SEE singlestep edge: " + edge.getId());
 			singlestep(edge);
 		}
 	}

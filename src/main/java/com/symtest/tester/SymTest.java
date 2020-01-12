@@ -115,6 +115,7 @@ public class SymTest {
 			while ((!stack.isEmpty()) && !(stack.peek().getEdge().equals(startEdge) && 
 										   !stack.peek().getBranch())) {
 				// Obtain the path that traverses the targets.
+				System.out.println("WWWHILE");
 				IPath path;
 				if (!hasEncounteredMaximumIterations(completePath)) {
 					FindCFPathAlgorithm algorithm = new FindCFPathAlgorithm(
@@ -130,6 +131,7 @@ public class SymTest {
 						path = algorithm.findCFPath(stack.peek().getEdge()
 								.getHead(), currentTargets);
 					}
+					System.out.println("PATHHHH:" + path);
 				} else {
 					// If maximum iterations are done, it is only an empty path
 					// that gets added
@@ -149,7 +151,7 @@ public class SymTest {
 				// Solve the predicate
 				SolverResult solution;
 				
-				logger.fine("Complete cfPath: " + cfPath);
+				System.out.println("Complete cfPath: " + cfPath);
 //				if (currentTargets.isEmpty()) {
 					try {
 
@@ -157,7 +159,7 @@ public class SymTest {
 						return (this.convert(set.getLeafNodes().iterator().next(),
 								solution));
 					} catch (UnSatisfiableException e) {
-						System.out.println("Unsatisfiable");
+						System.out.println("Unsatisfiable Path");
 					}
 //				}
 
@@ -312,8 +314,7 @@ public class SymTest {
 	public Stack<Entry> backtrack(
 			Stack<Entry> stack) {
 
-		if (shouldUseBacktrackingHeuristic() && !stack.isEmpty()) {
-			System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		if (false && shouldUseBacktrackingHeuristic() && !stack.isEmpty()) {
 			return backtrackWithHeuristic(stack);
 		} else {
 			return backtrackWithoutHeuristic(stack);
@@ -321,6 +322,7 @@ public class SymTest {
 	}
 
 	public boolean shouldUseBacktrackingHeuristic() {
+		// return false;
 		return ComputationTreeHandler.isInitialized();
 	}
 
@@ -333,19 +335,25 @@ public class SymTest {
 		// possible candidates for backtracking.
 		// XXXX This can be made more efficient.
 		ArrayList<Entry> destinations = new ArrayList<Entry>(stack);
-		System.out.println("XXX");
-		System.out.println(destinations);
+		destinations.remove(0);
 		Collections.sort(destinations);
+		N = N > destinations.size() ? destinations.size() : N;
 		ArrayList<Entry> possibleDest = new ArrayList<Entry>(destinations.subList(0, N));
 		// Sort the possible destinations based on weight of the MST formed with the edge and the 
 		// set of remaining decision edges.
 		Collections.sort(possibleDest, new MSTWeightCompare());
 		Entry destination = possibleDest.get(0);
+		System.out.println("XXX Possible Dest" + possibleDest);
+		System.out.println("XXX Chosen Dest" + destination);
 		// Pop out everything from the stack until the destination
 		while (!stack.peek().equals(destination)) {
 			stack.pop();
 		}
-		return stack;
+		System.out.println("XXX StackNOW" + stack);
+		// return stack;
+		Stack<Entry> x = backtrackWithoutHeuristic(stack);
+		System.out.println("XXX StackNOW!!!" + x);
+		return x;
 	}
 
 	/**
@@ -377,7 +385,7 @@ public class SymTest {
 		if (topmostPair.getBranch()) {
 			IEdge oldEdge = topmostPair.getEdge();
 			IEdge newEdge = getOtherEdge(oldEdge);
-			stack.push(new Entry(newEdge, false));
+			stack.push(new Entry(newEdge, false, topmostPair.getRemainingTargets()));
 			return stack;
 		} 
 
