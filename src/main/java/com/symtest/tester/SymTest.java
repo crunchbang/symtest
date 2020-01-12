@@ -115,8 +115,8 @@ public class SymTest {
 			while ((!stack.isEmpty()) && !(stack.peek().getEdge().equals(startEdge) && 
 										   !stack.peek().getBranch())) {
 				// Obtain the path that traverses the targets.
-				System.out.println("WWWHILE");
 				IPath path;
+				// System.out.println("WWWHILE" + hasEncounteredMaximumIterations(completePath)) ;
 				if (!hasEncounteredMaximumIterations(completePath)) {
 					FindCFPathAlgorithm algorithm = new FindCFPathAlgorithm(
 							this.mGraph, currentTargets,
@@ -131,17 +131,20 @@ public class SymTest {
 						path = algorithm.findCFPath(stack.peek().getEdge()
 								.getHead(), currentTargets);
 					}
-					System.out.println("PATHHHH:" + path);
+					// System.out.println("PATHHHH:" + path);
 				} else {
+					System.out.println("Could not find satisfiable path");
+					System.exit(1);
+					// FIX THIS LATER!
 					// If maximum iterations are done, it is only an empty path
 					// that gets added
 					path = new Path(mGraph);
-//					FindCFPathAlgorithm algorithm = new FindCFPathAlgorithm(
-//							this.mGraph, terminalTarget,
-//							this.mConvertor.getGraphNode(this.mTarget));
-//					path = algorithm.findLongestAcyclicPath(stack.peek().getFirst()
-//								.getHead(), currentTargets);
-//					System.out.println("FINAL PATH : " + path);
+					// FindCFPathAlgorithm algorithm = new FindCFPathAlgorithm(
+					// 		this.mGraph, terminalTarget,
+					// 		this.mConvertor.getGraphNode(this.mTarget));
+					// path = algorithm.findLongestAcyclicPath(stack.peek().getEdge()
+					// 			.getHead(), currentTargets);
+					// System.out.println("FINAL PATH : " + path);
 				}
 				completePath.setPath(addprefix(prefix, path.getPath()));
 				ArrayList<ICFEdge> cfPath = convertPathEdgesToCFGEdges(completePath);
@@ -151,7 +154,7 @@ public class SymTest {
 				// Solve the predicate
 				SolverResult solution;
 				
-				System.out.println("Complete cfPath: " + cfPath);
+				// System.out.println("Complete cfPath: " + cfPath);
 //				if (currentTargets.isEmpty()) {
 					try {
 
@@ -200,9 +203,9 @@ public class SymTest {
 							completePath.getPath().indexOf(
 									stack.peek().getEdge())));
 					updateStackTargets(stack, prefix);
-					System.out.println("#####UpdtedPrefix" + prefix + "####");
-					System.out.println("#####Targets" + convertTargetEdgesToGraphEdges(mTargets) + "####");
-					System.out.println("#####Updated STACK CONTENTS: " + Arrays.toString(stack.toArray()));
+					// System.out.println("#####UpdtedPrefix" + prefix + "####");
+					// System.out.println("#####Targets" + convertTargetEdgesToGraphEdges(mTargets) + "####");
+					// System.out.println("#####Updated STACK CONTENTS: " + Arrays.toString(stack.toArray()));
 				} else {
 					prefix.clear();
 					prefix.addAll(completePath.getPath().subList(
@@ -314,7 +317,7 @@ public class SymTest {
 	public Stack<Entry> backtrack(
 			Stack<Entry> stack) {
 
-		if (false && shouldUseBacktrackingHeuristic() && !stack.isEmpty()) {
+		if (shouldUseBacktrackingHeuristic() && !stack.isEmpty()) {
 			return backtrackWithHeuristic(stack);
 		} else {
 			return backtrackWithoutHeuristic(stack);
@@ -330,7 +333,7 @@ public class SymTest {
 		// XXXX Check if the past runs data has been loaded. Don't use
 		// this otherwise.
 
-		int N = 3;
+		int N = ComputationTreeHandler.N;
 		// We take the top N destinations with the highest compositeWeight as
 		// possible candidates for backtracking.
 		// XXXX This can be made more efficient.
@@ -342,17 +345,25 @@ public class SymTest {
 		// Sort the possible destinations based on weight of the MST formed with the edge and the 
 		// set of remaining decision edges.
 		Collections.sort(possibleDest, new MSTWeightCompare());
-		Entry destination = possibleDest.get(0);
-		System.out.println("XXX Possible Dest" + possibleDest);
-		System.out.println("XXX Chosen Dest" + destination);
-		// Pop out everything from the stack until the destination
-		while (!stack.peek().equals(destination)) {
+		// Entry destination = possibleDest.get(0);
+		MSTWeightCompare comp = new MSTWeightCompare();
+		Set<Entry> destination = new HashSet<Entry>();
+		Entry ideal = possibleDest.get(0);
+		for (Entry e : possibleDest) {
+			if (comp.compare(ideal, e) == 0) {
+				destination.add(e);
+			}
+		}
+		// System.out.println("XXX Possible Dest" + possibleDest);
+		// System.out.println("XXX Chosen Dest" + destination);
+		// Pop out everything from the stack until the first ideal destination
+		while (!destination.contains(stack.peek())) {
 			stack.pop();
 		}
-		System.out.println("XXX StackNOW" + stack);
+		// System.out.println("XXX StackNOW" + stack);
 		// return stack;
 		Stack<Entry> x = backtrackWithoutHeuristic(stack);
-		System.out.println("XXX StackNOW!!!" + x);
+		// System.out.println("XXX StackNOW!!!" + x);
 		return x;
 	}
 

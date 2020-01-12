@@ -28,31 +28,40 @@ public class Driver {
 			.getLogger(Driver.class.getName());
 
 	public static void main(String[] args) throws Exception {
-		//USE THIS to specify the input file
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/SingleInput.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/MultipleInput.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/NoWhile.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/NestedIf.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/Test3.cymbol";
-		
-		//HERE BE DRAGONS
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/Temp.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/Test2.cymbol";
-//		String inputFile = "/Users/athul/src/SKC/symtest/test_programs/Test3.cymbol";
+		// Input format
+		// Arg[0] - File_Name
+		// Convention:
+		// filename.cymbol : Cymbol Program
+		// filename.target : List of target edges in Cymbol program
+		// filename.data : Data from historical runs
+		// filename.meta : Metadata used to analyze historical runs
+		//				   Format:
+		//		           STARTING_EDGE LOOPING_EDGE
+		//				   LIST_OF_TARGETS (space separated)
+		// arg[1] - Number of Decision Nodes
+		System.out.println("### ARGS " + args[0] + " " + args[1]);
 		logger.info("Input file: " + args[0]);
+		// TIME - Computation Tree Construction
+		long startTime = System.nanoTime();
 		// Initialize Computation Tree
-		ComputationTreeHandler.init("/Users/athul/src/symtest/src/main/test/test_programs/H_3targets.out", "BEGIN->BB1", "BB2->D3");
-		ComputationTree ct = ComputationTreeHandler.get();
+		ComputationTreeHandler.init(args[0], Integer.parseInt(args[1]));
         System.out.println("Computation Tree Initialized");
-        ct.computeOrdering("D7->BB9 D10->BB12 D19->BB20");
+		long endTime = System.nanoTime();
+		double duration = (endTime - startTime) / 1000000.0;
+		System.out.println("\n---- TIME - Computation Tree Construction : " + duration + "ms ----");
 		// ANTLR Boilerplate code
 		// ANTLRInputStream input = new ANTLRInputStream(is);
-		CharStream input = CharStreams.fromFileName(args[0]);
+		CharStream input = CharStreams.fromFileName(args[0] + ".cymbol");
 		CymbolLexer lexer = new CymbolLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		CymbolParser parser = new CymbolParser(tokens);
 		ParseTree tree = parser.file();
 		CFGVisitor visitor = new CFGVisitor(args[0] + ".target");
+		// TIME - Symtest
+		startTime = System.nanoTime();
 		visitor.visit(tree);
+		endTime = System.nanoTime();
+		duration = (endTime - startTime) / 1000000.0;
+		System.out.println("\n---- TIME - Symtest : " + duration + "ms ----");
 	}
 }
